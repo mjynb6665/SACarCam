@@ -777,11 +777,17 @@ Process_FollowCar_SA(const CVector& CameraTarget, float TargetOrientation, CamCl
 		} else
 			alphaCorrected = true;
 	}
+	bool hasActiveCameraInput = (mouseChangesBeta || fabsf(stickX) > 0.0f || fabsf(stickY) > 0.0f);
+
 	float alphaSpeedFromStickY = yMovement * CARCAM_SET[camSetArrPos][12];
 	float betaSpeedFromStickX = xMovement * CARCAM_SET[camSetArrPos][12];
 	float v117 = CARCAM_SET[camSetArrPos][9];
 	float angleChangeStep = pow(CARCAM_SET[camSetArrPos][8], ms_fTimeStep);
-	float targetBetaWithStickBlendAmount = betaSpeedFromStickX + (targetBeta - cam->Beta) / max(ms_fTimeStep, 1.0f);
+	float targetBetaWithStickBlendAmount;
+	if (hasActiveCameraInput)
+		targetBetaWithStickBlendAmount = betaSpeedFromStickX + (targetBeta - cam->Beta) / max(ms_fTimeStep, 1.0f);
+	else
+		targetBetaWithStickBlendAmount = 0.0f;
 
 	if (targetBetaWithStickBlendAmount < -v117)
 		targetBetaWithStickBlendAmount = -v117;
@@ -826,7 +832,7 @@ Process_FollowCar_SA(const CVector& CameraTarget, float TargetOrientation, CamCl
 #ifdef LCS_CAM
 	if ((camSetArrPos <= 1 || camSetArrPos == 7) && targetAlpha < cam->Alpha && carPosChange >= newDistance) {
 #else
-	if (camSetArrPos <= 1 && targetAlpha < cam->Alpha && carPosChange >= newDistance) {
+	if (hasActiveCameraInput && camSetArrPos <= 1 && targetAlpha < cam->Alpha && carPosChange >= newDistance) {
 #endif
 		if (isCar && GetWheelsOnGround(car) > 1 ||
 			isBike && GetMysteriousWheelRelatedThingBike(car) > 1)
@@ -858,10 +864,14 @@ Process_FollowCar_SA(const CVector& CameraTarget, float TargetOrientation, CamCl
 		alphaWithSpeedAccounted = alphaSpeedFromStickY + targetAlpha;
 		cam->Alpha += alphaSpeedFromStickY;
 	}
-	else
+	else if (hasActiveCameraInput)
 	{
 		alphaWithSpeedAccounted = ms_fTimeStep * cam->AlphaSpeed + targetAlpha;
 		cam->Alpha += targetAlphaBlendAmount;
+	}
+	else
+	{
+		alphaWithSpeedAccounted = cam->Alpha;
 	}
 
 	if (cam->Alpha <= maxAlphaAllowed)
