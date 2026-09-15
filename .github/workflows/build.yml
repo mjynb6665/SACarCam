@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -14,10 +14,16 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Build ReleaseVC Win32
-        run: msbuild SACarCam.sln /p:Configuration=ReleaseVC /p:Platform=x86 /p:PlatformToolset=v142
+        run: msbuild SACarCam.sln /p:Configuration=ReleaseVC /p:Platform=x86
+
+      - name: Find output
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Recurse -Filter "SACarCam.asi" | Select-Object -ExpandProperty FullName
+          Write-Host "Found: $files"
 
       - name: Upload SACarCam.asi
         uses: actions/upload-artifact@v4
         with:
           name: SACarCam
-          path: SACarCam/ReleaseVC/SACarCam.asi
+          path: SACarCam/**/ReleaseVC/SACarCam.asi
