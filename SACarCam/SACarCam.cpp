@@ -1164,11 +1164,6 @@ DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 			InjectHook(0x456F40, &WellBufferMe, PATCH_JUMP);
 			InjectHook(0x459A54, &CCamIII::Process_FollowCar_SA_III, PATCH_NOTHING);
 			InjectHook(0x459B36, &CCamIII::Process_FollowCar_SA_III, PATCH_NOTHING);
-
-			// To block original rhino-firetruck turret movement
-			InjectHook(0x52260E, &CPad::FakeCarGunUpDown, PATCH_NOTHING);
-			InjectHook(0x53D628, &CPad::FakeCarGunLeftRight, PATCH_NOTHING);
-			InjectHook(0x5225D2, &CPad::FakeCarGunLeftRight, PATCH_NOTHING);
 		// VC
 		} else if (*(DWORD*)0x667BF5 == 0xB85548EC) {
 
@@ -1179,11 +1174,6 @@ DllMain(HINSTANCE hInst, DWORD reason, LPVOID)
 			InjectHook(0x483B3B, &CCamVC::Process_FollowCar_SA_VC, PATCH_NOTHING);
 			InjectHook(0x483B79, &CCamVC::Process_FollowCar_SA_VC, PATCH_NOTHING);
 			InjectHook(0x483C3C, &CCamVC::Process_FollowCar_SA_VC, PATCH_NOTHING);
-
-			// To block original rhino-firetruck turret movement
-			InjectHook(0x57ABAE, &CPad::FakeCarGunUpDown, PATCH_NOTHING);
-			InjectHook(0x57AB72, &CPad::FakeCarGunLeftRight, PATCH_NOTHING);
-			InjectHook(0x5865B8, &CPad::FakeCarGunLeftRight, PATCH_NOTHING);
 
 			// Patch zoom modes
 			// Only for VC atm., III doesn't have zoom values per veh. types
