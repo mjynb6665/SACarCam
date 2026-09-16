@@ -1043,82 +1043,9 @@ Process_FollowCar_SA(const CVector& CameraTarget, float TargetOrientation, CamCl
 	// SA
 	// gTargetCoordsForLookingBehind = TargetCoors;
 
-	// SA code from CAutomobile::TankControl/FireTruckControl.
-	if (car->m_modelIndex == Tank || car->m_modelIndex == FireTruk) {
-		CVector hi = Multiply3x3(cam->Front, car->GetMatrix());
-
-		// III/VC's firetruck turret angle is reversed
-		float angleToFace = (car->m_modelIndex == FireTruk ? -hi.Heading() : hi.Heading());
-
-		if (angleToFace <= *GetDoomAnglePtrLR(car) + PI) {
-			if (angleToFace < *GetDoomAnglePtrLR(car) - PI)
-				angleToFace = angleToFace + TWOPI;
-		} else {
-			angleToFace = angleToFace - TWOPI;
-		}
-
-		float neededTurn = angleToFace - *GetDoomAnglePtrLR(car);
-		float turnPerFrame = ms_fTimeStep * (car->m_modelIndex == FireTruk ? 0.05f : 0.015f);
-		if (neededTurn <= turnPerFrame) {
-			if (neededTurn < -turnPerFrame)
-				angleToFace = *GetDoomAnglePtrLR(car) - turnPerFrame;
-		} else {
-			angleToFace = turnPerFrame + *GetDoomAnglePtrLR(car);
-		}
-
-		if (car->m_modelIndex == Tank && *GetDoomAnglePtrLR(car) != angleToFace) {
-			DMAudio.PlayOneShot(car->m_audioEntityId, (isIII() ? 26 : 28), fabsf(angleToFace - *GetDoomAnglePtrLR(car)));
-		}
-		*GetDoomAnglePtrLR(car) = angleToFace;
-
-		if (*GetDoomAnglePtrLR(car) < -PI) {
-			*GetDoomAnglePtrLR(car) += TWOPI;
-		} else if (*GetDoomAnglePtrLR(car) > PI) {
-			*GetDoomAnglePtrLR(car) -= TWOPI;
-		}
-
-		// Because firetruk turret also has Y movement
-		if (car->m_modelIndex == FireTruk) {
-			float alphaToFace = atan2f(hi.z, hi.Magnitude2D()) + 0.2617994f;
-			float neededAlphaTurn = alphaToFace - *GetDoomAnglePtrUD(car);
-			float alphaTurnPerFrame = ms_fTimeStep * 0.02f;
-
-			if (neededAlphaTurn > alphaTurnPerFrame) {
-				neededTurn = alphaTurnPerFrame;
-				*GetDoomAnglePtrUD(car) = neededTurn + *GetDoomAnglePtrUD(car);
-			} else {
-				if (neededAlphaTurn >= -alphaTurnPerFrame) {
-					*GetDoomAnglePtrUD(car) = alphaToFace;
-				} else {
-					*GetDoomAnglePtrUD(car) = *GetDoomAnglePtrUD(car) - alphaTurnPerFrame;
-				}
-			}
-
-			float turretMinY = -0.34906587f;
-			float turretMaxY = 0.34906587f;
-			if (turretMinY <= *GetDoomAnglePtrUD(car)) {
-				if (*GetDoomAnglePtrUD(car) > turretMaxY)
-					*GetDoomAnglePtrUD(car) = turretMaxY;
-			} else {
-				*GetDoomAnglePtrUD(car) = turretMinY;
-			}
-
-			if (isReLCS) {
-				// Actual rotating turret for RE:LCS
-				// CAR_BUMP_REAR (firetruck turret lol) = 8
-				if (GetVehicleComponent(car, 8)) {
-					CMatrix mat;
-					CVector pos;
-
-					mat.Attach(RwFrameGetMatrix(GetVehicleComponent(car, 8)));
-					pos = mat.GetPosition();
-					mat.SetRotateZ(-(*GetDoomAnglePtrLR(car)));
-					mat.GetPosition() = pos;
-					mat.UpdateRW();
-				}
-			}
-		}
-	}
+	// Turret following camera - disabled
+	// if (car->m_modelIndex == Tank || car->m_modelIndex == FireTruk) {
+	// }
 
 	previousMode = cam->Mode;
 }
